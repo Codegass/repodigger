@@ -37,7 +37,7 @@ if not GITHUB_TOKEN:
     raise ValueError("GITHUB_TOKEN is empty.")
 
 # Main script execution
-def main(org_name, min_stars, download_folder_base, export_git_log):
+def main(org_name, min_stars, download_folder_base, export_git_log, language, disable_build_system_check):
     # Create the base download dir if it doesn't exist
     if not os.path.exists(download_folder_base):
         os.makedirs(download_folder_base)
@@ -63,15 +63,26 @@ def main(org_name, min_stars, download_folder_base, export_git_log):
 
     logging.info(f"Starting repodigger for organization: {org_name}")
     logging.info(f"Minimum stars: {min_stars}")
+    logging.info(f"Language filter: {language}")
     logging.info(f"Download folder: {org_projects_dir}")
 
+    # Determine if build system check should be performed
+    perform_build_check = False
+    if language.lower() == 'java':
+        if not disable_build_system_check:
+            perform_build_check = True
+            logging.info("Build system check is ENABLED for Java projects.")
+        else:
+            logging.info("Build system check is EXPLICITLY DISABLED via --disable-build-system-check flag for Java projects.")
+    else:
+        logging.warning(f"Build system check is AUTOMATICALLY DISABLED for non-Java language: {language}. All cloned repositories for this language will be kept regardless of their build system (if any).")
 
     # Get the project list from the GitHub API
     logging.info("=== Getting the project list from the GitHub API ===")
     # Calculate three years ago for the pushed date query
     three_years_ago = (datetime.now() - timedelta(days=3*365)).strftime('%Y-%m-%d') # Approximate 3 years
-    # Updated query to include stars>=min_stars and pushed date within last 3 years
-    base_url = f"https://api.github.com/search/repositories?q=org:{org_name}+language:Java+archived:false+pushed:>{three_years_ago}+stars:>={min_stars}&sort=updated&order=desc"
+    # Updated query to include stars>=min_stars and pushed date within last 3 years, and use language parameter
+    base_url = f"https://api.github.com/search/repositories?q=org:{org_name}+language:{language}+archived:false+pushed:>{three_years_ago}+stars:>={min_stars}&sort=updated&order=desc"
 
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
 
@@ -161,40 +172,58 @@ def main(org_name, min_stars, download_folder_base, export_git_log):
 
         try:
             if os.path.exists(repo_path_in_org_dir):
-                # If already exists, check its build system if not already processed
-                # This scenario implies a previous run might have been interrupted
-                # or the repo was manually placed. We re-check build system.
-                logging.info(f"Repo {repo_name} already exists. Checking build system...")
-                if check_build_system(repo_path_in_org_dir, repo_name):
-                    final_repos_to_process.append(repo_name)
-                    logging.info(f"Repo {repo_name} (existing) meets criteria.")
+                logging.info(f"Repo {repo_name} already exists. Verifying criteria...")
+                # If build check is active, we need to re-verify it for existing repos too.
+                if perform_build_check:
+                    if check_build_system(repo_path_in_org_dir, repo_name):
+                        final_repos_to_process.append(repo_name)
+                        logging.info(f"Repo {repo_name} (existing) meets build criteria.")
+                    else:
+                        logging.warning(f"Repo {repo_name} (existing) does not meet build system criteria. Excluding from this run.")
+                        # Unlike newly cloned ones, we don't typically delete pre-existing ones that fail a check unless specified.
                 else:
-                    # If it exists but doesn't meet build criteria, we might not delete it here
-                    # as it could be intentionally there. We just log and exclude.
-                    logging.warning(f"Repo {repo_name} (existing) does not meet build system criteria. Excluding from this run.")
+                    # Build check is not active, so if it exists and matches other criteria, it's good.
+                    final_repos_to_process.append(repo_name)
+                    logging.info(f"Repo {repo_name} (existing) kept as build system check is not active.")
                 continue
 
             logging.info(f"Cloning {repo_name} from {repo_clone_url}...")
             Repo.clone_from(repo_clone_url, repo_path_in_org_dir)
             logging.info(f"Successfully cloned {repo_name} to {repo_path_in_org_dir}")
 
-            if check_build_system(repo_path_in_org_dir, repo_name):
+            # Perform build system check only if applicable
+            if perform_build_check:
+                if check_build_system(repo_path_in_org_dir, repo_name):
+                    final_repos_to_process.append(repo_name)
+                    # Disk usage check only for successfully qualified and cloned repos
+                    total, used, free = shutil.disk_usage(download_folder_base) # Check usage of the base download folder
+                    used_percentage = (used / total) * 100
+                    logging.info(f"Disk usage of {download_folder_base}: {used_percentage:.2f}%")
+                    if used_percentage > 90:
+                        logging.warning(f"Disk usage exceeded 90% ({used_percentage:.2f}% used). Stopping the cloning process.")
+                        current_index = repos_with_details.index(repo_detail)
+                        remaining_api_repos = [r['name'] for r in repos_with_details[current_index+1:]]
+                        failed_clones.extend(remaining_api_repos) 
+                        logging.info(f"The following repos were not attempted due to disk space: {remaining_api_repos}")
+                        break 
+                else:
+                    # Build system check failed for a Java project, schedule for deletion
+                    repos_to_delete_after_check.append(repo_path_in_org_dir)
+            else:
+                # Build system check is not active (either non-Java lang or explicitly disabled for Java)
                 final_repos_to_process.append(repo_name)
-                # Disk usage check only for successfully qualified and cloned repos
-                total, used, free = shutil.disk_usage(download_folder_base) # Check usage of the base download folder
+                logging.info(f"Repo {repo_name} kept as build system check is not active.")
+                # Disk usage check also applies here if repo is kept
+                total, used, free = shutil.disk_usage(download_folder_base) 
                 used_percentage = (used / total) * 100
                 logging.info(f"Disk usage of {download_folder_base}: {used_percentage:.2f}%")
                 if used_percentage > 90:
                     logging.warning(f"Disk usage exceeded 90% ({used_percentage:.2f}% used). Stopping the cloning process.")
-                    # Identify remaining repos from the original API list to mark as "not attempted due to disk space"
                     current_index = repos_with_details.index(repo_detail)
                     remaining_api_repos = [r['name'] for r in repos_with_details[current_index+1:]]
-                    failed_clones.extend(remaining_api_repos) # Add them to failed_clones with a note or different list
+                    failed_clones.extend(remaining_api_repos) 
                     logging.info(f"The following repos were not attempted due to disk space: {remaining_api_repos}")
                     break 
-            else:
-                # Build system check failed, so schedule for deletion
-                repos_to_delete_after_check.append(repo_path_in_org_dir)
         
         except Exception as e:
             logging.warning(f"Failed to clone or process {repo_name}. Reason: {e}")
@@ -418,11 +447,12 @@ def main_cli():
     parser.add_argument("--min-stars", type=int, default=200, help="Minimum number of stars for a repository to be included.")
     parser.add_argument("--download-folder", type=str, required=True, help="Base folder to download repositories and store logs/results.")
     parser.add_argument("--export-git-log", action='store_true', help="Optional: Export git log for each repository and analyze test commits. Disabled by default.")
+    parser.add_argument("--language", type=str, default='Java', help="Programming language to filter repositories by (e.g., Java, Python). Defaults to Java.")
+    parser.add_argument("--disable-build-system-check", action='store_true', help="Disable the build system check (Maven/Gradle vs Ant/Bazel). By default, this check is active for Java projects.")
     
     args = parser.parse_args()
     
-    # Pass the new argument to main
-    main(args.organization, args.min_stars, args.download_folder, args.export_git_log)
+    main(args.organization, args.min_stars, args.download_folder, args.export_git_log, args.language, args.disable_build_system_check)
 
 if __name__ == "__main__":
     main_cli()

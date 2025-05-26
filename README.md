@@ -8,73 +8,123 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
-![RepoDigger Icon](./image.png)
+<img src="./image.png" alt="RepoDigger Icon" width="33%"/>
 
 </div>
 
 RepoDigger is a Python command-line tool designed to selectively download and optionally analyze Java repositories from specified GitHub organizations. It allows users to filter repositories based on criteria such as minimum star count, primary programming language (Java), archive status, and build system (Maven or Gradle, excluding Ant and Bazel).
 
-## Quick Start with UV
+## Quick Start: Install and Run `rd` Globally (Recommended)
 
-This project is configured for use with `uv`, an extremely fast Python package and project manager.
+This project is designed to be installed as a command-line tool using `uv`.
 
 1.  **Install `uv`**:
-    If you don't have `uv` installed, follow the official instructions (e.g., `curl -LsSf https://astral.sh/uv/install.sh | sh` for macOS/Linux).
+    If you haven't already, install `uv` by following the [official instructions](https://github.com/astral-sh/uv#installation):
+    *   macOS / Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+    *   Windows (PowerShell): `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`
 
-2.  **Set up GitHub Token**:
-    RepoDigger requires a GitHub Personal Access Token.
-    *   **Recommended**: Set an environment variable `GITHUB_TOKEN`:
+2.  **Set up GitHub Token (Crucial for Global Use)**:
+    RepoDigger requires a GitHub Personal Access Token. **You MUST set the `GITHUB_TOKEN` environment variable.**
+    *   macOS / Linux (bash/zsh - add to your `.bashrc`, `.zshrc` for persistence):
         ```bash
-        export GITHUB_TOKEN="your_actual_github_token_here"
+        export GITHUB_TOKEN="your_github_pat_here"
         ```
-    *   Alternatively, create a `SECRET.py` file in the project root with `GITHUB_TOKEN = "your_token"`.
+    *   Windows (PowerShell - to set permanently, search for "environment variables" in system settings):
+        ```powershell
+        $env:GITHUB_TOKEN = "your_github_pat_here"
+        ```
 
-3.  **Run with `uvx` (execute in a temporary environment)**:
+3.  **Install `rd` (RepoDigger command)**:
     Navigate to the project's root directory (where `pyproject.toml` is located) and run:
-    ```bash
-    uvx . -- --organization <ORG_NAME> --download-folder <PATH> [OPTIONS]
-    ```
-    Example:
-    ```bash
-    uvx . -- --organization Netflix --min-stars 100 --download-folder ./netflix_data
-    ```
-    *(Note the `--` before script arguments when running local projects with `uvx`)*
-
-4.  **Or, Install as a Tool with `uv tool install` (for global access)**:
-    In the project root:
     ```bash
     uv tool install .
     ```
-    This makes the `repodigger` command available globally (ensure `uv`'s tool bin directory is in your PATH). Then run:
+    This command installs `rd` and its dependencies into an isolated environment managed by `uv`. It also adds `rd` to a directory that should be part of your system's PATH (usually `~/.uv/bin` on macOS/Linux or `C:\Users\YourUser\.uv\bin` on Windows). If the command is not found after installation, ensure this directory is in your PATH or run `uv tool update-shell` and restart your terminal.
+
+4.  **Run `rd` from anywhere**:
+    Once installed, you can run RepoDigger using the `rd` command from any directory in your terminal. The following command downloads repositories from the specified organization with at least 200 stars (default) into the specified download folder.
+
+    **Replace `<ORG_NAME>` and `<PATH_TO_DOWNLOAD_FOLDER>`:**
     ```bash
-    repodigger --organization <ORG_NAME> --download-folder <PATH> [OPTIONS]
+    rd --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> --min-stars 200 --language Java
+    ```
+
+    Example (defaulting to Java, 200 stars):
+    ```bash
+    rd --organization Netflix --download-folder ./netflix_data
+    ```
+
+    Example (searching for Python projects):
+    ```bash
+    rd --organization google --download-folder ./google_python_data --language Python
+    ```
+
+    Example (Java projects, explicitly disabling the build system check):
+    ```bash
+    rd --organization Netflix --download-folder ./netflix_data_no_build_check --language Java --disable-build-system-check
+    ```
+
+    To include git log export (optional, most relevant for Java projects):
+    ```bash
+    rd --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> --export-git-log
+    ```
+
+## One-Click Run Scripts (Experimental - for local execution)
+
+For convenience, if you have the project code locally (e.g., cloned from git) but haven't installed `rd` globally, you can use basic run scripts (`run-repodigger.sh` for macOS/Linux and `run-repodigger.bat` for Windows) located in the repository. These scripts use `uvx . -- ...` to run the local version.
+
+*   Ensure your `GITHUB_TOKEN` environment variable is set.
+*   These scripts prompt for the organization and download folder, and use a default of 200 stars and Java language.
+*   To run on macOS/Linux: `cd path/to/project && ./run-repodigger.sh` (you might need `chmod +x run-repodigger.sh` first).
+*   To run on Windows: `cd path\to\project && run-repodigger.bat`.
+
+## Alternative: Running Local Version with `uvx` (for development/testing)
+
+If you are in the project's root directory and want to run the local code without installing it globally (e.g., for development or quick tests):
+
+1.  Ensure `uv` is installed and `GITHUB_TOKEN` is set (see Quick Start steps 1 & 2).
+2.  Run using `uvx . --` followed by the script arguments:
+    ```bash
+    uvx . -- --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
     ```
     Example:
     ```bash
-    repodigger --organization apache --min-stars 500 --download-folder ./apache_data --export-git-log
+    uvx . -- --organization Netflix --download-folder ./dev_test_netflix --min-stars 100
     ```
+    *(Note: `uvx . --` executes the local project. The one-click scripts above use this method.)*
 
-5.  **(For Development) Create a Local Virtual Environment**:
-    If you plan to modify the code or work on it locally:
+## For Development (Setting up a local virtual environment)
+
+If you plan to modify the RepoDigger code itself:
+
+1.  Ensure `uv` is installed and `GITHUB_TOKEN` is set (see Quick Start steps 1 & 2).
+2.  Clone the repository and navigate to the project directory.
+3.  Create and activate a virtual environment:
     ```bash
-    cd path/to/repodigger_project
-    uv venv  # Creates a .venv virtual environment
-    source .venv/bin/activate  # Or relevant activation script for your shell
-    uv pip install -e . # Installs the project in editable mode with its dependencies
-    # Now you can run it directly
-    python repodigger.py --organization <ORG_NAME> --download-folder <PATH> [OPTIONS]
+    uv venv
+    source .venv/bin/activate  # macOS/Linux
+    # .venv\Scripts\activate.bat  # Windows CMD
+    # .venv\Scripts\Activate.ps1 # Windows PowerShell
+    ```
+4.  Install the project in editable mode with its dependencies:
+    ```bash
+    uv pip install -e .
+    ```
+5.  Now you can run the script directly:
+    ```bash
+    python repodigger.py --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
     ```
 
 ## Features
 
 -   **Targeted Repository Downloading**: Downloads repositories from a specific GitHub organization.
 -   **Flexible Filtering**:
-    -   Filters for public, non-archived Java projects.
+    -   Filters for public, non-archived projects (defaults to Java via `--language` flag).
     -   Filters by a minimum number (or greater/equal) of GitHub stars.
-    -   Filters by projects managed with Maven or Gradle, automatically excluding those managed by Ant or Bazel. The tool inspects the entire repository structure to detect these build systems.
+    -   Optional Build System Check (for Java projects by default, can be disabled with `--disable-build-system-check`; automatically disabled for non-Java languages): Filters by projects managed with Maven or Gradle, automatically excluding those managed by Ant or Bazel. 
     -   Filters for projects updated within the last three years.
 -   **Custom Download Location**: Allows users to specify a directory where repositories and associated files will be saved.
--   **Optional Git Log Analysis**: (If `--export-git-log` is used)
+-   **Optional Git Log Analysis**: (If `--export-git-log` is used, most relevant for Java projects)
     -   Exports the git log for each downloaded repository into a CSV file.
     -   Filters these logs to identify commits related to test files (`src/test/.*Test.*\.java`).
     -   Merges individual test commit logs into a single comprehensive CSV file.
@@ -84,40 +134,29 @@ This project is configured for use with `uv`, an extremely fast Python package a
 ## Prerequisites
 
 1.  **Python 3.8+**: As defined in `pyproject.toml`.
-2.  **`uv` (Recommended)**: For environment and package management. Installation instructions above.
-3.  **Git**: The script uses `git` command-line tool to clone repositories and export logs. Make sure Git is installed and accessible in your system's PATH.
-4.  **GitHub Personal Access Token**:
-    -   The script requires a GitHub Personal Access Token (PAT) to interact with the GitHub API.
-    -   **Priority is given to the `GITHUB_TOKEN` environment variable.**
-    -   If the environment variable is not set, the script will attempt to import it from a `SECRET.py` file located in the project root (e.g., `GITHUB_TOKEN = "your_actual_github_token_here"`).
-    -   Create a token with the `repo` scope (or at least `public_repo`).
-    -   **Important**: If using `SECRET.py`, do not commit it or your token to version control. It is already included in the `.gitignore` file.
+2.  **`uv`**: For installation and execution. Installation instructions in Quick Start.
+3.  **Git**: Required by the script. Ensure it's in your system's PATH.
+4.  **GitHub Personal Access Token**: **MUST be set as an environment variable `GITHUB_TOKEN` for global `rd` command usage.** (See Quick Start for setup). If running `python repodigger.py` directly in a dev environment, it can alternatively use a local `SECRET.py` file.
 
-## Usage (if not using Quick Start `uvx` or `uv tool install` methods)
+## Command-Line Arguments (for the `rd` command or `python repodigger.py`)
 
-If you have set up a local development environment (e.g., using `uv venv` and `uv pip install -e .` as shown in Quick Start step 5):
+-   `--organization <ORG_NAME>`: (Required) Specifies the GitHub organization.
+-   `--download-folder <PATH_TO_DOWNLOAD_FOLDER>`: (Required) Base directory for downloads.
+-   `--min-stars <NUMBER>`: Minimum stars (>=). Default: `200`.
+-   `--language <LANGUAGE>`: Programming language. Default: `Java`.
+-   `--disable-build-system-check`: Disable build system check (active by default for Java, always off for others).
+-   `--export-git-log`: Optional: Export git logs (most relevant for Java).
 
-```bash
-python repodigger.py --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
-```
+### Examples (using the global `rd` command):
 
-### Command-Line Arguments (for `repodigger` or `python repodigger.py`):
-
--   `--organization <ORG_NAME>`: (Required) Specifies the GitHub organization (e.g., `Netflix`, `apache`, `google`).
--   `--download-folder <PATH_TO_DOWNLOAD_FOLDER>`: (Required) Defines the base directory where the organization-specific subfolder will be created.
--   `--min-stars <NUMBER>`: Minimum stars a repository must have (>=). Defaults to `200`.
--   `--export-git-log`: Optional flag to export git logs and analyze test commits. Disabled by default.
-
-### Examples (using direct script execution in an active virtual environment):
-
-1.  **Download from Netflix, >=500 stars, to `./downloaded_repos` (no git log):**
+1.  **Download from Netflix, default settings (Java, 200+ stars):**
     ```bash
-    python repodigger.py --organization Netflix --min-stars 500 --download-folder ./downloaded_repos
+    rd --organization Netflix --download-folder ./netflix_repos
     ```
 
-2.  **Download from Apache, default stars, to `/data/gh_projects`, export git logs:**
+2.  **Download Python projects from Google, 500+ stars, export logs (though log export is less relevant for Python):**
     ```bash
-    python repodigger.py --organization apache --download-folder /data/gh_projects --export-git-log
+    rd --organization google --download-folder /data/google_python_projects --min-stars 500 --language Python --export-git-log
     ```
 
 ## Output Structure
@@ -145,12 +184,15 @@ All downloaded data and logs are organized within the specified download folder,
 
 ## How Build System Detection Works
 
-RepoDigger attempts to identify projects using Maven or Gradle:
+RepoDigger can attempt to identify projects using Maven or Gradle, primarily for Java projects. This check is **enabled by default for Java projects** and **disabled by default (and not applicable) for other languages**.
 
-1.  After a repository is cloned, the script traverses its entire directory structure (ignoring `.git`).
-2.  It looks for: Maven (`pom.xml`), Gradle (`build.gradle`, `build.gradle.kts`), Ant (`build.xml`), Bazel (`WORKSPACE`, `BUILD`, `BUILD.bazel`).
-3.  A repository qualifies if it contains Maven/Gradle build files AND NOT Ant/Bazel files.
-4.  Non-qualifying repositories are logged and their cloned directory is removed.
+-   **For Java projects (if not disabled by `--disable-build-system-check`):**
+    1.  After a repository is cloned, the script traverses its entire directory structure (ignoring `.git`).
+    2.  It looks for: Maven (`pom.xml`), Gradle (`build.gradle`, `build.gradle.kts`), Ant (`build.xml`), Bazel (`WORKSPACE`, `BUILD`, `BUILD.bazel`).
+    3.  A repository qualifies if it contains Maven/Gradle build files AND NOT Ant/Bazel files.
+    4.  Non-qualifying Java repositories (those with Ant/Bazel, or no recognized Java build system if the check is on) are logged and their cloned directory is removed.
+-   **For non-Java projects, or if `--disable-build-system-check` is used for Java projects:**
+    -   The build system check is skipped. All cloned repositories that meet other criteria (stars, language, etc.) are kept.
 
 ## Logging
 
