@@ -1,4 +1,16 @@
+<div align="center">
+
 # RepoDigger
+
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Project Status: Maintained](https://img.shields.io/badge/status-maintained-brightgreen.svg)](https://github.com/codegass/repodigger/) 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+
+![RepoDigger Icon](./image.png)
+
+</div>
 
 RepoDigger is a Python command-line tool designed to selectively download and optionally analyze Java repositories from specified GitHub organizations. It allows users to filter repositories based on criteria such as minimum star count, primary programming language (Java), archive status, and build system (Maven or Gradle, excluding Ant and Bazel).
 

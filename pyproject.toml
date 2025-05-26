@@ -5,6 +5,7 @@ description = "A tool to download and optionally analyze Java repositories from 
 authors = [
     { name = "Your Name", email = "you@example.com" },
 ]
+license = {text = "MIT"}
 dependencies = [
     "GitPython",
     "pandas",
