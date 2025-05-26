@@ -3,7 +3,7 @@ name = "repodigger"
 version = "0.1.0"
 description = "A tool to download and optionally analyze Java repositories from GitHub organizations based on specific criteria."
 authors = [
-    { name = "Your Name", email = "you@example.com" },
+    { name = "Codegass", email = "wchweichenhao@gmail.com" },
 ]
 license = {text = "MIT"}
 dependencies = [
