@@ -8,10 +8,33 @@ import subprocess
 import logging
 import shutil
 import glob
+import sys
 
 import requests
 
-from SECRET import GITHUB_TOKEN
+# Attempt to get GITHUB_TOKEN from environment variable first
+GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')
+
+# If not found in environment, try to import from SECRET.py
+if GITHUB_TOKEN is None:
+    try:
+        from SECRET import GITHUB_TOKEN as SECRET_GITHUB_TOKEN
+        GITHUB_TOKEN = SECRET_GITHUB_TOKEN
+    except ImportError:
+        # Log an error and exit if GITHUB_TOKEN is not found in either location
+        # We need logging to be configured to see this if it happens early
+        # For now, print to stderr and raise an exception for immediate feedback
+        # This part will be more effective once logging is initialized, 
+        # but an early exit is crucial if the token is missing.
+        print("ERROR: GITHUB_TOKEN not found. Please set the GITHUB_TOKEN environment variable or create a SECRET.py file with GITHUB_TOKEN defined.", file=sys.stderr) # Added sys import for stderr
+        raise ImportError("GITHUB_TOKEN not found in environment or SECRET.py")
+
+# Check if GITHUB_TOKEN is still None or empty after attempts, and if so, handle error.
+if not GITHUB_TOKEN:
+    # This case might be redundant if the try-except block for SECRET.py handles it, 
+    # but it's a safeguard for an empty token from env or SECRET.py.
+    print("ERROR: GITHUB_TOKEN is empty. Please ensure it has a value in the environment variable or SECRET.py.", file=sys.stderr)
+    raise ValueError("GITHUB_TOKEN is empty.")
 
 # Main script execution
 def main(org_name, min_stars, download_folder_base, export_git_log):
@@ -45,9 +68,10 @@ def main(org_name, min_stars, download_folder_base, export_git_log):
 
     # Get the project list from the GitHub API
     logging.info("=== Getting the project list from the GitHub API ===")
-    one_year_ago = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
-    # Updated query to include stars
-    base_url = f"https://api.github.com/search/repositories?q=org:{org_name}+language:Java+archived:false+pushed:>{one_year_ago}+stars:>{min_stars}&sort=updated&order=desc"
+    # Calculate three years ago for the pushed date query
+    three_years_ago = (datetime.now() - timedelta(days=3*365)).strftime('%Y-%m-%d') # Approximate 3 years
+    # Updated query to include stars>=min_stars and pushed date within last 3 years
+    base_url = f"https://api.github.com/search/repositories?q=org:{org_name}+language:Java+archived:false+pushed:>{three_years_ago}+stars:>={min_stars}&sort=updated&order=desc"
 
     headers = {'Authorization': f'token {GITHUB_TOKEN}'}
 
@@ -388,7 +412,7 @@ def main(org_name, min_stars, download_folder_base, export_git_log):
     logging.info(f"Repodigger finished processing for {org_name}.")
 
 
-if __name__ == "__main__":
+def main_cli():
     parser = argparse.ArgumentParser(description="RepoDigger: Download and analyze GitHub repositories.")
     parser.add_argument("--organization", type=str, required=True, help="GitHub organization name (e.g., Netflix, apache).")
     parser.add_argument("--min-stars", type=int, default=200, help="Minimum number of stars for a repository to be included.")
@@ -399,5 +423,8 @@ if __name__ == "__main__":
     
     # Pass the new argument to main
     main(args.organization, args.min_stars, args.download_folder, args.export_git_log)
+
+if __name__ == "__main__":
+    main_cli()
 
 
