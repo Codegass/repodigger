@@ -75,7 +75,7 @@ This project is designed to be installed as a command-line tool using `uv`.
 
 ## One-Click Run Scripts (Experimental - for local execution)
 
-> [!NOTE]
+> [!TIP]
 > If you have the project code locally (e.g., cloned) but haven't installed `rd` globally, these scripts offer a convenient way to run the local version using `uvx`. Ensure your `GITHUB_TOKEN` environment variable is set.
 
 *   These scripts prompt for the organization and download folder, and use default settings (200 stars, Java language).
@@ -92,7 +92,7 @@ If you are in the project's root directory and want to run the local code withou
 1.  Ensure `uv` is installed and `GITHUB_TOKEN` is set (see Quick Start steps 1 & 2).
 2.  Run using `uvx . --` followed by the script arguments:
     
-    > [!NOTE]
+    > [!TIP]
     > `uvx . --` executes the local project from the current directory. The one-click scripts above use this method.
 
     ```bash
@@ -152,12 +152,12 @@ If you plan to modify the RepoDigger code itself:
 -   `--min-stars <NUMBER>`: Minimum stars (>=). Default: `200`.
 -   `--language <LANGUAGE>`: Programming language. Default: `Java`.
 
-    > [!NOTE]
+    > [!TIP]
     > While you can specify other languages (e.g., Python), the build system check and git log analysis for test commits are primarily tailored for Java projects and will be less effective or automatically disabled for other languages.
 
 -   `--disable-build-system-check`: Disable build system check (active by default for Java, always off for others).
 
-    > [!NOTE]
+    > [!TIP]
     > This flag allows you to download Java projects without filtering them by Maven/Gradle vs. Ant/Bazel. For non-Java languages, the build system check is always disabled regardless of this flag.
 
 -   `--export-git-log`: Optional: Export git logs (most relevant for Java).
