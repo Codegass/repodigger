@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+
+# Secrets
+SECRET.py
+
+# OS-specific
+.DS_Store
+
+# Test and Download Folders (examples, adjust as needed)
+test_downloads/
+downloaded_repos/
+*_projects/  # If your download folder consistently creates subfolders like ORG-projects
+
+# IDE / Editor specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Log files (if they are generated outside the project-specific download folders)
+*.log
+
+# Python Virtual Environment (if you use one in the project root)
+# venv/
+.venv/
+# env/
+.env/ 
