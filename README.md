@@ -20,6 +20,7 @@ This project is designed to be installed as a command-line tool using `uv`.
 
 1.  **Install `uv`**:
     If you haven't already, install `uv` by following the [official instructions](https://github.com/astral-sh/uv#installation).
+    
     > [!NOTE]
     > **macOS / Linux**:
     > ```bash
@@ -32,6 +33,7 @@ This project is designed to be installed as a command-line tool using `uv`.
 
 2.  **Set up GitHub Token**:
     RepoDigger requires a GitHub Personal Access Token.
+    
     > [!IMPORTANT]
     > For the global `rd` command to work, you **MUST** set the `GITHUB_TOKEN` environment variable.
     >
@@ -52,6 +54,7 @@ This project is designed to be installed as a command-line tool using `uv`.
     ```bash
     uv tool install .
     ```
+    
     > [!TIP]
     > This command installs `rd` and its dependencies into an isolated environment managed by `uv`. It also adds `rd` to a directory that should be part of your system's PATH (usually `~/.uv/bin` or similar). If the `rd` command is not found after installation, ensure this directory is in your PATH or run `uv tool update-shell` and restart your terminal.
 
@@ -77,6 +80,7 @@ This project is designed to be installed as a command-line tool using `uv`.
 
 *   These scripts prompt for the organization and download folder, and use default settings (200 stars, Java language).
 *   **macOS/Linux**: `cd path/to/project && ./run-repodigger.sh`
+    
     > [!TIP]
     > You might need to make the script executable first: `chmod +x run-repodigger.sh`
 *   **Windows**: `cd path\to\project && run-repodigger.bat`.
@@ -87,8 +91,10 @@ If you are in the project's root directory and want to run the local code withou
 
 1.  Ensure `uv` is installed and `GITHUB_TOKEN` is set (see Quick Start steps 1 & 2).
 2.  Run using `uvx . --` followed by the script arguments:
+    
     > [!NOTE]
     > `uvx . --` executes the local project from the current directory. The one-click scripts above use this method.
+
     ```bash
     uvx . -- --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
     ```
@@ -122,6 +128,7 @@ If you plan to modify the RepoDigger code itself:
 >    python repodigger.py --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
 >    ```
 
+
 ## Features
 
 -   **Targeted Repository Downloading**: Downloads repositories from a specific GitHub organization.
@@ -144,11 +151,15 @@ If you plan to modify the RepoDigger code itself:
 -   `--download-folder <PATH_TO_DOWNLOAD_FOLDER>`: (Required) Base directory for downloads.
 -   `--min-stars <NUMBER>`: Minimum stars (>=). Default: `200`.
 -   `--language <LANGUAGE>`: Programming language. Default: `Java`.
+
     > [!NOTE]
     > While you can specify other languages (e.g., Python), the build system check and git log analysis for test commits are primarily tailored for Java projects and will be less effective or automatically disabled for other languages.
+
 -   `--disable-build-system-check`: Disable build system check (active by default for Java, always off for others).
+
     > [!NOTE]
     > This flag allows you to download Java projects without filtering them by Maven/Gradle vs. Ant/Bazel. For non-Java languages, the build system check is always disabled regardless of this flag.
+
 -   `--export-git-log`: Optional: Export git logs (most relevant for Java).
 
 ### Examples (using the global `rd` command):
