@@ -31,8 +31,8 @@ This project is designed to be installed as a command-line tool using `uv`.
 > ```bash
 > export GITHUB_TOKEN="your_github_pat_here"
 > ```
-> ```
 > **Windows (PowerShell)** (to set permanently, search for "environment variables" in system settings):
+>
 > ```powershell
 > $env:GITHUB_TOKEN = "your_github_pat_here"
 > ```
