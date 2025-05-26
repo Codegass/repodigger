@@ -12,7 +12,7 @@
 
 </div>
 
-RepoDigger is a Python command-line tool designed to selectively download and optionally analyze Java repositories from specified GitHub organizations. It allows users to filter repositories based on criteria such as minimum star count, primary programming language (Java), archive status, and build system (Maven or Gradle, excluding Ant and Bazel).
+RepoDigger is a Python command-line tool designed to selectively download and optionally analyze repositories from specified GitHub organizations. It allows users to filter repositories based on criteria such as minimum star count, primary programming language (default is Java), archive status, and build system (Maven or Gradle, excluding Ant and Bazel).
 
 ## Quick Start: Install and Run `rd` Globally (Recommended)
 
