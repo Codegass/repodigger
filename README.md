@@ -47,8 +47,8 @@ For local development or running the script directly (e.g., `python repodigger.p
     uv tool install .
     ```
     
-    > [!TIP]
-    > This command installs `rd` and its dependencies into an isolated environment managed by `uv`. It also adds `rd` to a directory that should be part of your system's PATH (usually `~/.uv/bin` or similar). If the `rd` command is not found after installation, ensure this directory is in your PATH or run `uv tool update-shell` and restart your terminal.
+> [!TIP]
+> This command installs `rd` and its dependencies into an isolated environment managed by `uv`. It also adds `rd` to a directory that should be part of your system's PATH (usually `~/.uv/bin` or similar). If the `rd` command is not found after installation, ensure this directory is in your PATH or run `uv tool update-shell` and restart your terminal.
 
 4.  **Run `rd` from anywhere**:
     Once installed, you can run RepoDigger using the `rd` command from any directory in your terminal. The following command downloads repositories from the specified organization with at least 200 stars (default) into the specified download folder.
