@@ -1,7 +1,7 @@
 [project]
 name = "repodigger"
 version = "0.1.0"
-description = "A tool to download and optionally analyze Java repositories from GitHub organizations based on specific criteria."
+description = "A tool to download and optionally analyze repositories from GitHub organizations based on specific criteria."
 authors = [
     { name = "Codegass", email = "wchweichenhao@gmail.com" },
 ]
