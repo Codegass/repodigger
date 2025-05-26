@@ -19,35 +19,41 @@ RepoDigger is a Python command-line tool designed to selectively download and op
 This project is designed to be installed as a command-line tool using `uv`.
 
 1.  **Install `uv`**:
-    If you haven't already, install `uv` by following the [official instructions](https://github.com/astral-sh/uv#installation):
-    *   macOS / Linux: 
-    ```bash
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    ```
-    *   Windows (PowerShell): 
-    ```powershell
-    powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-    ```
+    If you haven't already, install `uv` by following the [official instructions](https://github.com/astral-sh/uv#installation).
+    > [!NOTE]
+    > **macOS / Linux**:
+    > ```bash
+    > curl -LsSf https://astral.sh/uv/install.sh | sh
+    > ```
+    > **Windows (PowerShell)**:
+    > ```powershell
+    > powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+    > ```
 
-2.  **Set up GitHub Token (Crucial for Global Use)**:
-    RepoDigger requires a GitHub Personal Access Token. 
-    *   **For global `rd` command**: You **MUST** set the `GITHUB_TOKEN` environment variable.
-        *   macOS / Linux (bash/zsh - add to your `.bashrc`, `.zshrc` for persistence):
-            ```bash
-            export GITHUB_TOKEN="your_github_pat_here"
-            ```
-        *   Windows (PowerShell - to set permanently, search for "environment variables" in system settings):
-            ```powershell
-            $env:GITHUB_TOKEN = "your_github_pat_here"
-            ```
-    *   **For local development/direct script execution (e.g., `python repodigger.py` or `uvx . --`)**: If the `GITHUB_TOKEN` environment variable is not set, the script will alternatively look for a `SECRET.py` file in the project root with the content: `GITHUB_TOKEN = "your_github_pat_here"`. This file is listed in `.gitignore`.
+2.  **Set up GitHub Token**:
+    RepoDigger requires a GitHub Personal Access Token.
+    > [!IMPORTANT]
+    > For the global `rd` command to work, you **MUST** set the `GITHUB_TOKEN` environment variable.
+    >
+    > **macOS / Linux** (bash/zsh - add to your `.bashrc` or `.zshrc` for persistence):
+    > ```bash
+    > export GITHUB_TOKEN="your_github_pat_here"
+    > ```
+    > **Windows (PowerShell)** (to set permanently, search for "environment variables" in system settings):
+    > ```powershell
+    > $env:GITHUB_TOKEN = "your_github_pat_here"
+    > ```
+
+    > [!TIP]
+    > For local development or running the script directly (e.g., `python repodigger.py` or `uvx . --`), if the `GITHUB_TOKEN` environment variable is not set, the script will alternatively look for a `SECRET.py` file in the project root. This file should contain `GITHUB_TOKEN = "your_github_pat_here"` and is gitignored.
 
 3.  **Install `rd` (RepoDigger command)**:
     Navigate to the project's root directory (where `pyproject.toml` is located) and run:
     ```bash
     uv tool install .
     ```
-    This command installs `rd` and its dependencies into an isolated environment managed by `uv`. It also adds `rd` to a directory that should be part of your system's PATH (usually `~/.uv/bin` on macOS/Linux or `C:\Users\YourUser\.uv\bin` on Windows). If the command is not found after installation, ensure this directory is in your PATH or run `uv tool update-shell` and restart your terminal.
+    > [!TIP]
+    > This command installs `rd` and its dependencies into an isolated environment managed by `uv`. It also adds `rd` to a directory that should be part of your system's PATH (usually `~/.uv/bin` or similar). If the `rd` command is not found after installation, ensure this directory is in your PATH or run `uv tool update-shell` and restart your terminal.
 
 4.  **Run `rd` from anywhere**:
     Once installed, you can run RepoDigger using the `rd` command from any directory in your terminal. The following command downloads repositories from the specified organization with at least 200 stars (default) into the specified download folder.
@@ -56,42 +62,33 @@ This project is designed to be installed as a command-line tool using `uv`.
     ```bash
     rd --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> --min-stars 200 --language Java
     ```
-
-    Example (defaulting to Java, 200 stars):
+    Examples:
     ```bash
-    rd --organization Netflix --download-folder ./netflix_data
-    ```
-
-    Example (searching for Python projects):
-    ```bash
+    rd --organization Netflix --download-folder ./netflix_data # Defaults to Java, 200 stars
     rd --organization google --download-folder ./google_python_data --language Python
-    ```
-
-    Example (Java projects, explicitly disabling the build system check):
-    ```bash
     rd --organization Netflix --download-folder ./netflix_data_no_build_check --language Java --disable-build-system-check
-    ```
-
-    To include git log export (optional, most relevant for Java projects):
-    ```bash
-    rd --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> --export-git-log
+    rd --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> --export-git-log # For Java logs
     ```
 
 ## One-Click Run Scripts (Experimental - for local execution)
 
-For convenience, if you have the project code locally (e.g., cloned from git) but haven't installed `rd` globally, you can use basic run scripts (`run-repodigger.sh` for macOS/Linux and `run-repodigger.bat` for Windows) located in the repository. These scripts use `uvx . -- ...` to run the local version.
+> [!NOTE]
+> If you have the project code locally (e.g., cloned) but haven't installed `rd` globally, these scripts offer a convenient way to run the local version using `uvx`. Ensure your `GITHUB_TOKEN` environment variable is set.
 
-*   Ensure your `GITHUB_TOKEN` environment variable is set.
-*   These scripts prompt for the organization and download folder, and use a default of 200 stars and Java language.
-*   To run on macOS/Linux: `cd path/to/project && ./run-repodigger.sh` (you might need `chmod +x run-repodigger.sh` first).
-*   To run on Windows: `cd path\to\project && run-repodigger.bat`.
+*   These scripts prompt for the organization and download folder, and use default settings (200 stars, Java language).
+*   **macOS/Linux**: `cd path/to/project && ./run-repodigger.sh`
+    > [!TIP]
+    > You might need to make the script executable first: `chmod +x run-repodigger.sh`
+*   **Windows**: `cd path\to\project && run-repodigger.bat`.
 
 ## Alternative: Running Local Version with `uvx` (for development/testing)
 
-If you are in the project's root directory and want to run the local code without installing it globally (e.g., for development or quick tests):
+If you are in the project's root directory and want to run the local code without installing it globally:
 
 1.  Ensure `uv` is installed and `GITHUB_TOKEN` is set (see Quick Start steps 1 & 2).
 2.  Run using `uvx . --` followed by the script arguments:
+    > [!NOTE]
+    > `uvx . --` executes the local project from the current directory. The one-click scripts above use this method.
     ```bash
     uvx . -- --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
     ```
@@ -99,30 +96,31 @@ If you are in the project's root directory and want to run the local code withou
     ```bash
     uvx . -- --organization Netflix --download-folder ./dev_test_netflix --min-stars 100
     ```
-    *(Note: `uvx . --` executes the local project. The one-click scripts above use this method.)*
 
 ## For Development (Setting up a local virtual environment)
 
 If you plan to modify the RepoDigger code itself:
 
-1.  Ensure `uv` is installed.
-2.  Set up GitHub Token (see Quick Start step 2)
-3.  Clone the repository and navigate to the project directory.
-4.  Create and activate a virtual environment:
-    ```bash
-    uv venv
-    source .venv/bin/activate  # macOS/Linux
-    # .venv\Scripts\activate.bat  # Windows CMD
-    # .venv\Scripts\Activate.ps1 # Windows PowerShell
-    ```
-5.  Install the project in editable mode with its dependencies:
-    ```bash
-    uv pip install -e .
-    ```
-6.  Now you can run the script directly:
-    ```bash
-    python repodigger.py --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
-    ```
+> [!TIP]
+> Follow these steps to set up a dedicated development environment:
+> 1. Ensure `uv` is installed.
+> 2. Set up GitHub Token (environment variableตำรวจ `GITHUB_TOKEN` or a local `SECRET.py` file, see Quick Start step 2).
+> 3. Clone the repository and navigate to the project directory.
+> 4. Create and activate a virtual environment:
+>    ```bash
+>    uv venv
+>    source .venv/bin/activate  # macOS/Linux
+>    # .venv\Scripts\activate.bat  # Windows CMD
+>    # .venv\Scripts\Activate.ps1 # Windows PowerShell
+>    ```
+> 5. Install the project in editable mode with its dependencies:
+>    ```bash
+>    uv pip install -e .
+>    ```
+> 6. Now you can run the script directly:
+>    ```bash
+>    python repodigger.py --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
+>    ```
 
 ## Features
 
@@ -146,7 +144,11 @@ If you plan to modify the RepoDigger code itself:
 -   `--download-folder <PATH_TO_DOWNLOAD_FOLDER>`: (Required) Base directory for downloads.
 -   `--min-stars <NUMBER>`: Minimum stars (>=). Default: `200`.
 -   `--language <LANGUAGE>`: Programming language. Default: `Java`.
+    > [!NOTE]
+    > While you can specify other languages (e.g., Python), the build system check and git log analysis for test commits are primarily tailored for Java projects and will be less effective or automatically disabled for other languages.
 -   `--disable-build-system-check`: Disable build system check (active by default for Java, always off for others).
+    > [!NOTE]
+    > This flag allows you to download Java projects without filtering them by Maven/Gradle vs. Ant/Bazel. For non-Java languages, the build system check is always disabled regardless of this flag.
 -   `--export-git-log`: Optional: Export git logs (most relevant for Java).
 
 ### Examples (using the global `rd` command):
@@ -186,19 +188,25 @@ All downloaded data and logs are organized within the specified download folder,
 
 ## How Build System Detection Works
 
-RepoDigger can attempt to identify projects using Maven or Gradle, primarily for Java projects. This check is **enabled by default for Java projects** and **disabled by default (and not applicable) for other languages**.
+> [!IMPORTANT]
+> RepoDigger's build system detection (Maven/Gradle vs. Ant/Bazel) is primarily designed for **Java projects**.
+>
+> *   It is **enabled by default** for Java projects.
+> *   It is **always disabled** for non-Java languages.
 
 -   **For Java projects (if not disabled by `--disable-build-system-check`):**
     1.  After a repository is cloned, the script traverses its entire directory structure (ignoring `.git`).
     2.  It looks for: Maven (`pom.xml`), Gradle (`build.gradle`, `build.gradle.kts`), Ant (`build.xml`), Bazel (`WORKSPACE`, `BUILD`, `BUILD.bazel`).
     3.  A repository qualifies if it contains Maven/Gradle build files AND NOT Ant/Bazel files.
-    4.  Non-qualifying Java repositories (those with Ant/Bazel, or no recognized Java build system if the check is on) are logged and their cloned directory is removed.
+    4.  Non-qualifying Java repositories are logged and their cloned directory is removed.
 -   **For non-Java projects, or if `--disable-build-system-check` is used for Java projects:**
-    -   The build system check is skipped. All cloned repositories that meet other criteria (stars, language, etc.) are kept.
+    -   The build system check is skipped. All cloned repositories that meet other criteria are kept.
 
 ## Logging
 
-Detailed logs are saved to `<download_folder>/<ORG_NAME>-projects/repodigger.log`.
+> [!TIP]
+> Detailed logs are saved to `<download_folder>/<ORG_NAME>-projects/repodigger.log`.
+> Check this file for script progress, warnings, errors, and details about excluded repositories.
 
 ---
 
