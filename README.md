@@ -65,29 +65,37 @@ This project is designed to be installed as a command-line tool using `uv`.
     ```bash
     rd --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> --min-stars 200 --language Java
     ```
-    Examples:
+    <details>
+        <summary>Examples:</summary>
+        
     ```bash
     rd --organization Netflix --download-folder ./netflix_data # Defaults to Java, 200 stars
     rd --organization google --download-folder ./google_python_data --language Python
     rd --organization Netflix --download-folder ./netflix_data_no_build_check --language Java --disable-build-system-check
     rd --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> --export-git-log # For Java logs
     ```
+    
+    </details>
+      
+-----
 
-## One-Click Run Scripts (Experimental - for local execution)
+### One-Click Run Scripts (Experimental - for local execution)
 
-> [!TIP]
-> If you have the project code locally (e.g., cloned) but haven't installed `rd` globally, these scripts offer a convenient way to run the local version using `uvx`. Ensure your `GITHUB_TOKEN` environment variable is set.
+<details>
+<summary>If you want to quick running without `uvx`:</summary>    
+
+If you have the project code locally (e.g., cloned) but haven't installed `rd` globally, these scripts offer a convenient way to run the local version using `uvx`. Ensure your `GITHUB_TOKEN` environment variable is set.
 
 *   These scripts prompt for the organization and download folder, and use default settings (200 stars, Java language).
 *   **macOS/Linux**: `cd path/to/project && ./run-repodigger.sh`
-    
-    > [!TIP]
-    > You might need to make the script executable first: `chmod +x run-repodigger.sh`
+      You might need to make the script executable first: `chmod +x run-repodigger.sh`
 *   **Windows**: `cd path\to\project && run-repodigger.bat`.
+</details>
 
-## Alternative: Running Local Version with `uvx` (for development/testing)
-
-If you are in the project's root directory and want to run the local code without installing it globally:
+### Alternative: Running Local Version with `uvx` (for development/testing)
+<details>
+    
+<summary>If you are in the project's root directory and want to run the local code without installing it globally:</summary>
 
 1.  Ensure `uv` is installed and `GITHUB_TOKEN` is set (see Quick Start steps 1 & 2).
 2.  Run using `uvx . --` followed by the script arguments:
@@ -102,32 +110,34 @@ If you are in the project's root directory and want to run the local code withou
     ```bash
     uvx . -- --organization Netflix --download-folder ./dev_test_netflix --min-stars 100
     ```
+</details>
 
-## For Development (Setting up a local virtual environment)
+### For Development (Setting up a local virtual environment)
+<details>
+<summary>If you plan to modify the RepoDigger code itself:</summary>
 
-If you plan to modify the RepoDigger code itself:
+    Follow these steps to set up a dedicated development environment:
+    1. Ensure `uv` is installed.
+    2. Set up GitHub Token (environment variableตำรวจ `GITHUB_TOKEN` or a local `SECRET.py` file, see Quick Start step 2).
+    3. Clone the repository and navigate to the project directory.
+    4. Create and activate a virtual environment:
+        ```bash
+        uv venv
+        source .venv/bin/activate  # macOS/Linux
+        # .venv\Scripts\activate.bat  # Windows CMD
+        # .venv\Scripts\Activate.ps1 # Windows PowerShell
+        ```
+     5. Install the project in editable mode with its dependencies:
+        ```bash
+        uv pip install -e .
+        ```
+     6. Now you can run the script directly:
+        ```bash
+        python repodigger.py --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
+        ```
+</details>
 
-> [!TIP]
-> Follow these steps to set up a dedicated development environment:
-> 1. Ensure `uv` is installed.
-> 2. Set up GitHub Token (environment variableตำรวจ `GITHUB_TOKEN` or a local `SECRET.py` file, see Quick Start step 2).
-> 3. Clone the repository and navigate to the project directory.
-> 4. Create and activate a virtual environment:
->    ```bash
->    uv venv
->    source .venv/bin/activate  # macOS/Linux
->    # .venv\Scripts\activate.bat  # Windows CMD
->    # .venv\Scripts\Activate.ps1 # Windows PowerShell
->    ```
-> 5. Install the project in editable mode with its dependencies:
->    ```bash
->    uv pip install -e .
->    ```
-> 6. Now you can run the script directly:
->    ```bash
->    python repodigger.py --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
->    ```
-
+-----
 
 ## Features
 
