@@ -21,15 +21,14 @@ This project is designed to be installed as a command-line tool using `uv`.
 1.  **Install `uv`**:
     If you haven't already, install `uv` by following the [official instructions](https://github.com/astral-sh/uv#installation).
     
-    > [!NOTE]
-    > **macOS / Linux**:
-    > ```bash
-    > curl -LsSf https://astral.sh/uv/install.sh | sh
-    > ```
-    > **Windows (PowerShell)**:
-    > ```powershell
-    > powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-    > ```
+    **macOS / Linux**:
+    ```bash
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    ```
+    **Windows (PowerShell)**:
+    ```powershell
+    powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+    ```
 
 2.  **Set up GitHub Token**:
     RepoDigger requires a GitHub Personal Access Token.
@@ -45,9 +44,10 @@ This project is designed to be installed as a command-line tool using `uv`.
     > ```powershell
     > $env:GITHUB_TOKEN = "your_github_pat_here"
     > ```
+    >
 
-    > [!TIP]
-    > For local development or running the script directly (e.g., `python repodigger.py` or `uvx . --`), if the `GITHUB_TOKEN` environment variable is not set, the script will alternatively look for a `SECRET.py` file in the project root. This file should contain `GITHUB_TOKEN = "your_github_pat_here"` and is gitignored.
+
+    For local development or running the script directly (e.g., `python repodigger.py` or `uvx . --`), if the `GITHUB_TOKEN` environment variable is not set, the script will alternatively look for a `SECRET.py` file in the project root. This file should contain `GITHUB_TOKEN = "your_github_pat_here"` and is gitignored.
 
 3.  **Install `rd` (RepoDigger command)**:
     Navigate to the project's root directory (where `pyproject.toml` is located) and run:
