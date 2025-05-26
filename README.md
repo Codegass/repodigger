@@ -39,7 +39,7 @@ This project is designed to be installed as a command-line tool using `uv`.
 
 
 
-    For local development or running the script directly (e.g., `python repodigger.py` or `uvx . --`), if the `GITHUB_TOKEN` environment variable is not set, the script will alternatively look for a `SECRET.py` file in the project root. This file should contain `GITHUB_TOKEN = "your_github_pat_here"` and is gitignored.
+For local development or running the script directly (e.g., `python repodigger.py` or `uvx . --`), if the `GITHUB_TOKEN` environment variable is not set, the script will alternatively look for a `SECRET.py` file in the project root. This file should contain `GITHUB_TOKEN = "your_github_pat_here"` and is gitignored.
 
 3.  **Install `rd` (RepoDigger command)**:
     Navigate to the project's root directory (where `pyproject.toml` is located) and run:
