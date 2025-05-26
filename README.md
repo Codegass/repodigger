@@ -20,19 +20,27 @@ This project is designed to be installed as a command-line tool using `uv`.
 
 1.  **Install `uv`**:
     If you haven't already, install `uv` by following the [official instructions](https://github.com/astral-sh/uv#installation):
-    *   macOS / Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`
-    *   Windows (PowerShell): `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`
+    *   macOS / Linux: 
+    ```bash
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    ```
+    *   Windows (PowerShell): 
+    ```powershell
+    powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+    ```
 
 2.  **Set up GitHub Token (Crucial for Global Use)**:
-    RepoDigger requires a GitHub Personal Access Token. **You MUST set the `GITHUB_TOKEN` environment variable.**
-    *   macOS / Linux (bash/zsh - add to your `.bashrc`, `.zshrc` for persistence):
-        ```bash
-        export GITHUB_TOKEN="your_github_pat_here"
-        ```
-    *   Windows (PowerShell - to set permanently, search for "environment variables" in system settings):
-        ```powershell
-        $env:GITHUB_TOKEN = "your_github_pat_here"
-        ```
+    RepoDigger requires a GitHub Personal Access Token. 
+    *   **For global `rd` command**: You **MUST** set the `GITHUB_TOKEN` environment variable.
+        *   macOS / Linux (bash/zsh - add to your `.bashrc`, `.zshrc` for persistence):
+            ```bash
+            export GITHUB_TOKEN="your_github_pat_here"
+            ```
+        *   Windows (PowerShell - to set permanently, search for "environment variables" in system settings):
+            ```powershell
+            $env:GITHUB_TOKEN = "your_github_pat_here"
+            ```
+    *   **For local development/direct script execution (e.g., `python repodigger.py` or `uvx . --`)**: If the `GITHUB_TOKEN` environment variable is not set, the script will alternatively look for a `SECRET.py` file in the project root with the content: `GITHUB_TOKEN = "your_github_pat_here"`. This file is listed in `.gitignore`.
 
 3.  **Install `rd` (RepoDigger command)**:
     Navigate to the project's root directory (where `pyproject.toml` is located) and run:
@@ -97,20 +105,21 @@ If you are in the project's root directory and want to run the local code withou
 
 If you plan to modify the RepoDigger code itself:
 
-1.  Ensure `uv` is installed and `GITHUB_TOKEN` is set (see Quick Start steps 1 & 2).
-2.  Clone the repository and navigate to the project directory.
-3.  Create and activate a virtual environment:
+1.  Ensure `uv` is installed.
+2.  Set up GitHub Token (see Quick Start step 2)
+3.  Clone the repository and navigate to the project directory.
+4.  Create and activate a virtual environment:
     ```bash
     uv venv
     source .venv/bin/activate  # macOS/Linux
     # .venv\Scripts\activate.bat  # Windows CMD
     # .venv\Scripts\Activate.ps1 # Windows PowerShell
     ```
-4.  Install the project in editable mode with its dependencies:
+5.  Install the project in editable mode with its dependencies:
     ```bash
     uv pip install -e .
     ```
-5.  Now you can run the script directly:
+6.  Now you can run the script directly:
     ```bash
     python repodigger.py --organization <ORG_NAME> --download-folder <PATH_TO_DOWNLOAD_FOLDER> [OPTIONS]
     ```
@@ -131,14 +140,7 @@ If you plan to modify the RepoDigger code itself:
     -   Provides basic statistics, such as the number of unique authors for test commits per project.
 -   **Detailed Logging**: Maintains a log file (`repodigger.log`) capturing the script's operations, warnings, and errors.
 
-## Prerequisites
-
-1.  **Python 3.8+**: As defined in `pyproject.toml`.
-2.  **`uv`**: For installation and execution. Installation instructions in Quick Start.
-3.  **Git**: Required by the script. Ensure it's in your system's PATH.
-4.  **GitHub Personal Access Token**: **MUST be set as an environment variable `GITHUB_TOKEN` for global `rd` command usage.** (See Quick Start for setup). If running `python repodigger.py` directly in a dev environment, it can alternatively use a local `SECRET.py` file.
-
-## Command-Line Arguments (for the `rd` command or `python repodigger.py`)
+## Command-Line Arguments
 
 -   `--organization <ORG_NAME>`: (Required) Specifies the GitHub organization.
 -   `--download-folder <PATH_TO_DOWNLOAD_FOLDER>`: (Required) Base directory for downloads.
