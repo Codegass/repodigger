@@ -13,6 +13,9 @@ dependencies = [
 ]
 requires-python = ">=3.8"
 
+[tool.setuptools]
+py-modules = ["repodigger"]
+
 [project.scripts]
 rd = "repodigger:main_cli"
 
