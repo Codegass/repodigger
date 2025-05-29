@@ -27,3 +27,6 @@ downloaded_repos/
 .venv/
 # env/
 .env/ 
+repodigger.egg-info/
+
+build/
